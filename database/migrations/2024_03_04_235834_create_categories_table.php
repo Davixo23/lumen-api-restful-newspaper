@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('alias',60)->unique();
             $table->smallInteger('position');
             $table->boolean('published');
-            $table->timestamps();
+            $table->timestamps();// pone las fechas y horas en created_at y updated_at
             $table->string('created_by',60);
             $table->string('updated_by',60)->nullable();// permite nulos
             // se crea una tabla con essa definicion cuando se lea las migraciones

@@ -16,3 +16,13 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->get('/categories',['uses'=> 'CategoryController@index']);//llamada a metodo controlador de categrias sobre el verbo get
+$router->get('/categories/{id}',['uses'=> 'CategoryController@read']);// llamada por id
+$router->post('/categories',['uses'=> 'CategoryController@create']);
+$router->put('/categories/{id}',['uses'=> 'CategoryController@update']);
+$router->patch('/categories/{id}',['uses'=> 'CategoryController@patch']);
+$router->delete('/categories/{id}',['uses'=> 'CategoryController@delete']);
+
+// no olvidar que put es para actualizar por completo
+// pero patch es para actualziar un parametro solamente o parcialmente
