@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();// llave primaria y es autoincremental automatico controla laravel;
             $table->string('title',60)->unique();// unicos
             $table->string('alias',60)->unique();
-            $table->smallInteger('position',60);
+            $table->smallInteger('position');
             $table->boolean('published');
             $table->timestamps();
             $table->string('created_by',60);
