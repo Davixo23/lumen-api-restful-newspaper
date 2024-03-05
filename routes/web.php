@@ -16,13 +16,22 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+$router->group(['prefix'=> 'api'],function() use($router){//agrupacion de rutas
+    $router->group(['prefix'=> 'v1'],function() use($router){
 
-$router->get('/categories',['uses'=> 'CategoryController@index']);//llamada a metodo controlador de categrias sobre el verbo get
-$router->get('/categories/{id}',['uses'=> 'CategoryController@read']);// llamada por id
-$router->post('/categories',['uses'=> 'CategoryController@create']);
-$router->put('/categories/{id}',['uses'=> 'CategoryController@update']);
-$router->patch('/categories/{id}',['uses'=> 'CategoryController@patch']);
-$router->delete('/categories/{id}',['uses'=> 'CategoryController@delete']);
+        $router->get('/categories',['uses'=> 'CategoryController@index']);//llamada a metodo controlador de categrias sobre el verbo get
+        $router->get('/categories/{id}',['uses'=> 'CategoryController@read']);// llamada por id
+        $router->post('/categories',['uses'=> 'CategoryController@create']);
+        $router->put('/categories/{id}',['uses'=> 'CategoryController@update']);
+        $router->patch('/categories/{id}',['uses'=> 'CategoryController@patch']);
+        $router->delete('/categories/{id}',['uses'=> 'CategoryController@delete']);
+        // no olvidar que put es para actualizar por completo
+        // pero patch es para actualziar un parametro solamente o parcialmente
 
-// no olvidar que put es para actualizar por completo
-// pero patch es para actualziar un parametro solamente o parcialmente
+    });
+    $router->group(['prefix'=> 'v2'],function() use($router){
+
+        $router->get('/categories',['uses'=> 'CategoryController@indexV2']);
+
+    });
+});

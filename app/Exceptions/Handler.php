@@ -8,9 +8,14 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
+use PDOException;
+use Exception;
+use Illuminate\Http\Response;// uso del response como respuetas de http
+use App\Traits\ApiResponser;// uso del trait creado
 
 class Handler extends ExceptionHandler
-{
+{   
+    use ApiResponser;// injection del trait en la clase Handler
     /**
      * A list of the exception types that should not be reported.
      *
@@ -49,6 +54,39 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        // captura de las excepciones
+        if ($exception instanceof HttpException) {
+            $code = $exception->getStatusCode();
+            $message = Response::$statusTexts[$code];
+
+            return $this->errorResponse($message, $code);
+        }
+        if ($exception instanceof ModelNotFoundException) {// no hay el modelo
+            $model = strtolower(class_basename($exception->getModel()));
+
+            return $this->errorResponse("Does not exist any instance of {$model} with the given id", Response::HTTP_NOT_FOUND);
+        }
+        if ($exception instanceof ValidationException) {// error de validacion
+            $errors = $exception->validator->errors()->getMessages();
+            return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if ($exception instanceof PDOException) {// error del lenguaje escalado desde unniqueconstraintviolation ya existe una llave duplicada o algun campo con el nombre que se pretende guardar
+            $errors = $exception->getMessage();
+            return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if ($exception instanceof Exception) {// cualquier otra excepcion 
+            $errors = $exception->getMessage();
+            return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        // if ($exception instanceof UniqueConstraintViolationException) {// ya existe un alisa con ese nombre
+        //     $errors = $exception->getMessage();
+        //     return $this->errorResponse($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        // }
+
+        if (env('APP_DEBUG', true)) {
+            return parent::render($request, $exception);
+        }
+
+        return $this->errorResponse('Unexpected error. Try later', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
